@@ -1,0 +1,103 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/yarn-error.log
+
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/
+!/tmp/pids/.keep
+
+# Ignore uploaded files in development.
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/
+!/tmp/storage/.keep
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key
+
+# Ignore application configuration
+/config/application.yml
+
+# Ignore environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore database files
+*.sqlite3
+*.sqlite3-*
+
+# Ignore coverage reports
+/coverage/
+
+# Ignore bundle vendor
+/bundle
+
+# Ignore all .byebug_history files
+.byebug_history
+
+# Ignore node modules
+node_modules/
+
+# Ignore yarn files
+.yarn-integrity
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Ignore Docker volumes
+docker-compose.override.yml
+
+# 環境変数・設定ファイル
+.env.*
+config/application.yml
+config/credentials.yml.enc
+config/master.key
+
+# ログ・一時ファイル
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# テストカバレッジ
+/coverage/
+
+# OS/IDE固有
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# バンドル・キャッシュ
+/bundle
+/node_modules
+/yarn-error.log
+
+# Docker
+/docker-compose.override.yml 
