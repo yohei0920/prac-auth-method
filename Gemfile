@@ -30,7 +30,7 @@ gem "rack-cors", "~> 2.0"                 # CORS
 gem "rack-attack", "~> 6.6"               # Rate limiting
 
 # Background jobs
-gem "sidekiq", "~> 7.0"                   # 非同期処理
+gem "sidekiq", "~> 8.0"                   # 非同期処理
 gem "redis", "~> 5.0"                     # Redis
 
 # Testing
