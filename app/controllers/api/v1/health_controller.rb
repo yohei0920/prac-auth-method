@@ -4,105 +4,100 @@ module Api
       include BasicAuthConcern
       include ApiResponseConcern
       include JsonSchemaConcern
+      include ErrorMessagesConcern
       before_action :basic_authenticate
 
       def index
-        unless params[:message].present?
-          render_error(
-            code: 'MISSING_PARAMETER',
-            message: 'message parameter is required',
-            details: 'Please provide a message parameter in your request',
-            status: :bad_request
-          )
-          return
-        end
+        data_params = health_params
+        return if data_params.empty?
         
         render_success({
           status: 'ok',
-          message: params[:message]
+          message: data_params[:message]
         })
       end
 
       def create
-        # JSONボディからパラメータを取得
         data_params = health_params
-        return if data_params.empty? # エラーが発生した場合は早期リターン
+        return if data_params.empty?
         
-        render_success({
-          status: 'created',
-          message: 'POST request received',
-          data: data_params[:data],
-          settings: data_params[:settings],
-          metadata: data_params[:metadata],
-          tags: data_params[:tags],
-          nested_data: data_params[:nested_data]
-        })
+        render_success(build_response_data(data_params, 'created'))
       end
 
       def update
-        # JSONボディからパラメータを取得
         data_params = health_params
-        return if data_params.empty? # エラーが発生した場合は早期リターン
+        return if data_params.empty?
         
-        render_success({
-          status: 'updated',
-          message: 'PUT request received',
-          id: data_params[:id],
-          data: data_params[:data],
-          settings: data_params[:settings],
-          metadata: data_params[:metadata],
-          tags: data_params[:tags],
-          nested_data: data_params[:nested_data]
-        })
+        render_success(build_response_data(data_params, 'updated'))
       end
 
       def destroy
-        unless params[:id].present?
-          render_error(
-            code: 'MISSING_PARAMETER',
-            message: 'id parameter is required',
-            details: 'Please provide an id parameter to specify what to delete',
-            status: :bad_request
-          )
-          return
-        end
-
+        data_params = health_params
+        return if data_params.empty?
+        
         render_success({
           status: 'deleted',
           message: 'DELETE request received',
-          id: params[:id]
+          id: data_params[:id]
         })
       end
 
       private
 
+      def build_response_data(data_params, action_type)
+        response_data = {
+          status: action_type,
+          message: "#{action_type.upcase} request received"
+        }
+
+        # データが存在する場合のみ追加
+        response_data[:data] = data_params[:data] if data_params[:data].present?
+        response_data[:id] = data_params[:id] if data_params[:id].present?
+        response_data[:settings] = data_params[:settings] if data_params[:settings].present?
+        response_data[:metadata] = data_params[:metadata] if data_params[:metadata].present?
+        response_data[:tags] = data_params[:tags] if data_params[:tags].present?
+        response_data[:nested_data] = data_params[:nested_data] if data_params[:nested_data].present?
+
+        response_data
+      end
+
       def health_params
-        # ネストしたデータ構造を許可
-        permitted_params = params.require(:health).permit(
-          :id, 
-          :data, 
-          :message,
-          # ネストしたオブジェクトの許可
-          settings: [:enabled, :timeout, :retry_count],
-          metadata: [:version, :created_at, :tags],
-          # 配列の許可
-          tags: [],
-          # ネストした配列の許可
-          nested_data: [:name, :value, sub_items: [:id, :label]]
-        )
-        
-        # JSON Schemaバリデーション（パラメータ取得後に実行）
-        return permitted_params if validate_json_schema(params.to_unsafe_h, health_schema)
-        
-        {}
+        case request.method
+        when 'GET', 'DELETE'
+          permitted_keys = request.get? ? [:message, :id] : [:id]
+          permitted_params = params.permit(*permitted_keys)
+
+          # 必須パラメータのバリデーション
+          if request.get? && !permitted_params[:message].present?
+            error_config = get_error_message(:missing_parameter, param_name: 'message')
+            render_error(**error_config, status: :bad_request)
+            return {}
+          elsif request.delete? && !permitted_params[:id].present?
+            error_config = get_error_message(:missing_parameter, param_name: 'id')
+            render_error(**error_config, status: :bad_request)
+            return {}
+          end
+
+          permitted_params
+        else
+          permitted_params = params.require(:health).permit(
+            :id, 
+            :data, 
+            :message,
+            settings: [:enabled, :timeout, :retry_count],
+            metadata: [:version, :created_at, :tags],
+            tags: [],
+            nested_data: [:name, :value, sub_items: [:id, :label]]
+          )
+          
+          # JSON Schemaバリデーション
+          return permitted_params if validate_json_schema(params.to_unsafe_h, health_schema)
+          
+          {}
+        end
       rescue ActionController::ParameterMissing => e
-        # パラメータが不足している場合は適切なエラーを返す
-        render_error(
-          code: 'MISSING_PARAMETER',
-          message: 'Required parameters missing',
-          details: 'Please provide the required parameters in the request body',
-          status: :bad_request
-        )
+        error_config = get_error_message(:missing_parameters_body)
+        render_error(**error_config, status: :bad_request)
         return {}
       end
     end

@@ -1,5 +1,6 @@
 module ApiResponseConcern
   extend ActiveSupport::Concern
+  include ErrorMessagesConcern
 
   included do
     rescue_from JSON::ParserError, with: :handle_json_parse_error
@@ -34,20 +35,12 @@ module ApiResponseConcern
   end
 
   def handle_json_parse_error(exception)
-    render_error(
-      code: 'INVALID_JSON',
-      message: 'Invalid JSON format in request body',
-      details: 'The request body contains malformed JSON. Please check your JSON syntax.',
-      status: :bad_request
-    )
+    error_config = get_error_message(:invalid_json)
+    render_error(**error_config, status: :bad_request)
   end
 
   def handle_parameter_missing(exception)
-    render_error(
-      code: 'MISSING_PARAMETER',
-      message: "Required parameter missing: #{exception.param}",
-      details: "The '#{exception.param}' parameter is required but was not provided.",
-      status: :bad_request
-    )
+    error_config = get_error_message(:parameter_missing, param_name: exception.param)
+    render_error(**error_config, status: :bad_request)
   end
 end 
