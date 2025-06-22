@@ -13,7 +13,7 @@ gem "sqlite3", "~> 1.4", platforms: %i[ mingw mswin x64_mingw jruby ]
 
 # Authentication gems
 gem "devise", "~> 4.9"                    # 認証基盤
-gem "jwt", "~> 2.7"                       # JWT認証
+gem "jwt", "~> 3.0"                       # JWT認証
 gem "doorkeeper", "~> 5.6"                # OAuth 2.0
 gem "bcrypt", "~> 3.1.7"                  # パスワード暗号化
 
