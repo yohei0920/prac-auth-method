@@ -11,6 +11,9 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       get 'health', to: 'health#index'
+      post 'health', to: 'health#create'
+      put 'health', to: 'health#update'
+      delete 'health', to: 'health#destroy'
     end
   end
 end
