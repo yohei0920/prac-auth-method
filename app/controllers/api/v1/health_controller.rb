@@ -3,6 +3,7 @@ module Api
     class HealthController < ApplicationController
       include BasicAuthConcern
       include ApiResponseConcern
+      include JsonSchemaConcern
       before_action :basic_authenticate
 
       def index
@@ -77,7 +78,7 @@ module Api
 
       def health_params
         # ネストしたデータ構造を許可
-        params.require(:health).permit(
+        permitted_params = params.require(:health).permit(
           :id, 
           :data, 
           :message,
@@ -89,6 +90,11 @@ module Api
           # ネストした配列の許可
           nested_data: [:name, :value, sub_items: [:id, :label]]
         )
+        
+        # JSON Schemaバリデーション（パラメータ取得後に実行）
+        return permitted_params if validate_json_schema(params.to_unsafe_h, health_schema)
+        
+        {}
       rescue ActionController::ParameterMissing => e
         # パラメータが不足している場合は適切なエラーを返す
         render_error(

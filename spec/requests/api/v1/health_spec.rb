@@ -159,6 +159,76 @@ RSpec.describe 'Api::V1::Health', type: :request do
         expect(json_response['data']['nested_data'][0]['name']).to eq('item1')
         expect(json_response['data']['nested_data'][0]['sub_items'][0]['label']).to eq('sub1')
       end
+
+      it 'JSON Schemaバリデーションエラーで400 Bad Requestを返す（timeoutが範囲外）' do
+        invalid_data = {
+          health: {
+            data: 'test data',
+            settings: {
+              enabled: true,
+              timeout: 150,  # 最大値100を超えている
+              retry_count: 3
+            }
+          }
+        }
+
+        post '/api/v1/health', 
+             params: invalid_data.to_json, 
+             headers: @auth_headers
+        expect(response).to have_http_status(:bad_request)
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response['success']).to eq(false)
+        expect(json_response['error']['code']).to eq('SCHEMA_VALIDATION_ERROR')
+        expect(json_response['error']['message']).to eq('JSON Schema validation failed')
+        expect(json_response['error']['details']).to include('timeout')
+      end
+
+      it 'JSON Schemaバリデーションエラーで400 Bad Requestを返す（不正なversion形式）' do
+        invalid_data = {
+          health: {
+            data: 'test data',
+            metadata: {
+              version: 'invalid-version',  # 正規表現パターンに合わない
+              created_at: '2024-01-01T00:00:00Z'
+            }
+          }
+        }
+
+        post '/api/v1/health', 
+             params: invalid_data.to_json, 
+             headers: @auth_headers
+        expect(response).to have_http_status(:bad_request)
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response['success']).to eq(false)
+        expect(json_response['error']['code']).to eq('SCHEMA_VALIDATION_ERROR')
+        expect(json_response['error']['message']).to eq('JSON Schema validation failed')
+        expect(json_response['error']['details']).to include('version')
+      end
+
+      it 'JSON Schemaバリデーションエラーで400 Bad Requestを返す（不正なプロパティ）' do
+        invalid_data = {
+          health: {
+            data: 'test data',
+            settings: {
+              enabled: true,
+              timeout: 30,
+              invalid_property: 'should not be allowed'  # 許可されていないプロパティ
+            }
+          }
+        }
+
+        post '/api/v1/health', 
+             params: invalid_data.to_json, 
+             headers: @auth_headers
+        expect(response).to have_http_status(:bad_request)
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response['success']).to eq(false)
+        expect(json_response['error']['code']).to eq('SCHEMA_VALIDATION_ERROR')
+        expect(json_response['error']['message']).to eq('JSON Schema validation failed')
+      end
     end
   end
 
@@ -258,6 +328,35 @@ RSpec.describe 'Api::V1::Health', type: :request do
         expect(json_response['data']['tags']).to eq(['critical', 'monitoring'])
         expect(json_response['data']['nested_data'][0]['name']).to eq('item2')
         expect(json_response['data']['nested_data'][0]['sub_items'][0]['label']).to eq('sub3')
+      end
+
+      it 'JSON Schemaバリデーションエラーで400 Bad Requestを返す（負の値）' do
+        invalid_data = {
+          health: {
+            id: '123',
+            data: 'test data',
+            nested_data: [
+              {
+                name: 'item1',
+                value: -10,  # 最小値0未満
+                sub_items: [
+                  { id: 1, label: 'sub1' }
+                ]
+              }
+            ]
+          }
+        }
+
+        put '/api/v1/health', 
+            params: invalid_data.to_json, 
+            headers: @auth_headers
+        expect(response).to have_http_status(:bad_request)
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response['success']).to eq(false)
+        expect(json_response['error']['code']).to eq('SCHEMA_VALIDATION_ERROR')
+        expect(json_response['error']['message']).to eq('JSON Schema validation failed')
+        expect(json_response['error']['details']).to include('value')
       end
     end
   end

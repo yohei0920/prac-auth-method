@@ -24,6 +24,7 @@ gem "rswag-ui", "~> 2.8"
 # Serialization
 gem "active_model_serializers", "~> 0.10" # JSON serialization
 gem "jbuilder", "~> 2.11"                 # JSON builder
+gem "json-schema", "~> 4.0"               # JSON Schema validation
 
 # Security
 gem "rack-cors", "~> 2.0"                 # CORS
