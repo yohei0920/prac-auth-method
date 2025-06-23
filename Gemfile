@@ -44,6 +44,8 @@ group :development, :test do
 end
 
 group :development do
+  gem "puma-metrics"                        # Pumaのメトリクス監視
+  gem "rack-mini-profiler", "~> 3.0"      # パフォーマンスプロファイラ
   gem "listen", "~> 3.3"                  # ファイル監視
   gem "spring"                            # 開発環境の高速化
   gem "annotate", "~> 3.2"                # モデル注釈

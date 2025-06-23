@@ -39,3 +39,8 @@ plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
+
+# puma-metrics を有効にする
+plugin :metrics
+# メトリクス取得用のポートを指定 (デフォルトは9393)
+metrics_url 'tcp://0.0.0.0:9393'
