@@ -49,7 +49,7 @@ group :development do
   gem "listen", "~> 3.3"                  # ファイル監視
   gem "spring"                            # 開発環境の高速化
   gem "annotate", "~> 3.2"                # モデル注釈
-  gem "bullet", "~> 7.0"                  # N+1クエリ検出
+  gem "bullet", "~> 8.0"                  # N+1クエリ検出
   gem "rubocop", "~> 1.50"                # コード品質
   gem "rubocop-rails", "~> 2.19"          # Rails用RuboCop
   
