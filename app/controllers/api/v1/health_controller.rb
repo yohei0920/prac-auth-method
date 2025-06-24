@@ -1,11 +1,12 @@
 module Api
   module V1
     class HealthController < ApplicationController
-      include BasicAuthConcern
+      # include BasicAuthConcern
+      include TokenAuthConcern
       include ApiResponseConcern
       include JsonSchemaConcern
       include ErrorMessagesConcern
-      before_action :basic_authenticate
+      # before_action :basic_authenticate
 
       def index
         data_params = health_params
@@ -13,7 +14,8 @@ module Api
         
         render_success({
           status: 'ok',
-          message: data_params[:message]
+          message: data_params[:message],
+          user: current_user.name
         })
       end
 

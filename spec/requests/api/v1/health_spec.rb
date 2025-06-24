@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Health', type: :request do
+  let!(:user) { User.create!(email: "test@example.com", name: "Test User") }
+
   describe 'GET /api/v1/health' do
     context '認証なしの場合' do
       it '401 Unauthorizedを返す' do
@@ -12,7 +14,7 @@ RSpec.describe 'Api::V1::Health', type: :request do
     context '認証ありの場合' do
       before do
         @auth_headers = {
-          'HTTP_AUTHORIZATION' => 'Basic ' + Base64.strict_encode64('admin:password')
+          'Authorization' => "Bearer #{user.api_token}"
         }
       end
 
@@ -54,7 +56,7 @@ RSpec.describe 'Api::V1::Health', type: :request do
     context '不正な認証情報の場合' do
       it '401 Unauthorizedを返す' do
         auth_headers = {
-          'HTTP_AUTHORIZATION' => 'Basic ' + Base64.strict_encode64('wrong:credentials')
+          'Authorization' => 'Bearer wrongtoken'
         }
         
         get '/api/v1/health', headers: auth_headers
@@ -74,8 +76,8 @@ RSpec.describe 'Api::V1::Health', type: :request do
     context '認証ありの場合' do
       before do
         @auth_headers = {
-          'HTTP_AUTHORIZATION' => 'Basic ' + Base64.strict_encode64('admin:password'),
-          'CONTENT_TYPE' => 'application/json'
+          'Authorization' => "Bearer #{user.api_token}",
+          'Content-Type' => 'application/json'
         }
       end
 
@@ -243,8 +245,8 @@ RSpec.describe 'Api::V1::Health', type: :request do
     context '認証ありの場合' do
       before do
         @auth_headers = {
-          'HTTP_AUTHORIZATION' => 'Basic ' + Base64.strict_encode64('admin:password'),
-          'CONTENT_TYPE' => 'application/json'
+          'Authorization' => "Bearer #{user.api_token}",
+          'Content-Type' => 'application/json'
         }
       end
 
@@ -372,7 +374,7 @@ RSpec.describe 'Api::V1::Health', type: :request do
     context '認証ありの場合' do
       before do
         @auth_headers = {
-          'HTTP_AUTHORIZATION' => 'Basic ' + Base64.strict_encode64('admin:password')
+          'Authorization' => "Bearer #{user.api_token}"
         }
       end
 
