@@ -32,6 +32,12 @@ module ErrorMessagesConcern
       code: 'MISSING_PARAMETER',
       message: 'Required parameter missing: %{param_name}',
       details: "The '%{param_name}' parameter is required but was not provided."
+    },
+
+    unauthorized: {
+      code: 'UNAUTHORIZED',
+      message: 'Authentication failed or token is invalid',
+      details: 'You are not authorized to access this resource'
     }
   }.freeze
 
