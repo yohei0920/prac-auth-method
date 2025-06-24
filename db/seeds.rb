@@ -7,3 +7,18 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+# テスト用ユーザーの作成
+User.find_or_create_by!(email: 'test@example.com') do |user|
+  user.name = 'Test User'
+end
+
+User.find_or_create_by!(email: 'admin@example.com') do |user|
+  user.name = 'Admin User'
+end
+
+puts "Seed data created successfully!"
+puts "Test users:"
+User.all.each do |user|
+  puts "- #{user.name} (#{user.email})"
+end
