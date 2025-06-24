@@ -27,7 +27,7 @@ gem "jbuilder", "~> 2.11"                 # JSON builder
 gem "json-schema", "~> 4.0"               # JSON Schema validation
 
 # Security
-gem "rack-cors", "~> 2.0"                 # CORS
+gem "rack-cors", "~> 3.0"                 # CORS
 gem "rack-attack", "~> 6.6"               # Rate limiting
 
 # Background jobs
