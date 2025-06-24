@@ -52,10 +52,19 @@ group :development do
   gem "bullet", "~> 7.0"                  # N+1クエリ検出
   gem "rubocop", "~> 1.50"                # コード品質
   gem "rubocop-rails", "~> 2.19"          # Rails用RuboCop
+  
+  # Debugging gems
+  gem "pry", "~> 0.14"                    # デバッガー
+  gem "pry-byebug", "~> 3.10"             # pry + byebug
+  gem "pry-rails", "~> 0.3"               # Rails用pry
+  gem "pry-doc", "~> 1.4"                 # ドキュメント表示
+  gem "pry-stack_explorer", "~> 0.5"      # スタックトレース表示
 end
 
 group :test do
   gem "simplecov", "~> 0.22"              # テストカバレッジ
+  gem "pry", "~> 0.14"                    # デバッガー
+  gem "pry-byebug", "~> 3.10"             # pry + byebug
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
