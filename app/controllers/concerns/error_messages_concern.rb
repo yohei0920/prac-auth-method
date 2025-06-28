@@ -38,6 +38,12 @@ module ErrorMessagesConcern
       code: 'UNAUTHORIZED',
       message: 'Authentication failed or token is invalid',
       details: 'You are not authorized to access this resource'
+    },
+
+    token_expired: {
+      code: 'TOKEN_EXPIRED',
+      message: 'Token has expired',
+      details: 'Your authentication token has expired. Please login again to get a new token.'
     }
   }.freeze
 

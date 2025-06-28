@@ -15,6 +15,11 @@ Rails.application.routes.draw do
       post 'auth/refresh', to: 'auth#refresh'
       post 'auth/logout', to: 'auth#logout'
       
+      # JWT認証関連のルート
+      post 'auth/jwt_login', to: 'auth#jwt_login'
+      post 'auth/jwt_refresh', to: 'auth#jwt_refresh'
+      post 'auth/jwt_logout', to: 'auth#jwt_logout'
+      
       # 既存のヘルスチェックルート
       get 'health', to: 'health#index'
       post 'health', to: 'health#create'
