@@ -168,4 +168,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT認証
