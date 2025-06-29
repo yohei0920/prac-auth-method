@@ -20,6 +20,11 @@ paths:
       tags:
         - Health
       summary: ヘルスチェック
+      parameters:
+        - name: message
+          in: query
+          schema:
+            type: string
       description: APIの健全性を確認するエンドポイント
       operationId: getHealth
       responses:
@@ -33,6 +38,12 @@ paths:
                 status: "healthy"
                 timestamp: "2024-01-01T00:00:00Z"
                 version: "1.0.0"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       tags:
         - Health
@@ -52,6 +63,66 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+        - Health
+      summary: ヘルスデータ更新
+      description: 既存のヘルスデータを更新
+      operationId: updateHealth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HealthRequest"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: データが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+        - Health
+      summary: ヘルスデータ削除
+      description: ヘルスデータを削除
+      operationId: deleteHealth
+      responses:
+        "200":
+          description: 削除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Health data deleted successfully"
+        "404":
+          description: データが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/v1/auth/login:
     post:
       tags:
@@ -78,10 +149,139 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: トークン再生成
+      description: 現在のAPIトークンを使用して新しいトークンを生成
+      operationId: refreshToken
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: トークン再生成成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: ログアウト
+      description: 現在のAPIトークンを無効化
+      operationId: logout
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/jwt_login:
+    post:
+      tags:
+        - JWT Authentication
+      summary: JWT認証ログイン
+      description: JWTトークンを生成し、JWTトークンとユーザーが返る
+      operationId: jwt_login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JWTLoginRequest"
+      responses:
+        "200":
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JWTLoginResponse"
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/jwt_refresh:
+    post:
+      tags:
+        - JWT Authentication
+      summary: JWTトークン再生成
+      description: 現在のJWTトークンを使用して新しいJWTトークンを生成
+      operationId: jwt_refresh
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: JWTトークン再生成成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JWTLoginResponse"
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: トークン期限切れ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/jwt_logout:
+    post:
+      tags:
+        - JWT Authentication
+      summary: JWTログアウト
+      description: JWTトークンを無効化（実際にはサーバー側でトークンを管理しないため、成功メッセージのみ返す）
+      operationId: jwt_logout
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthResponse:
       type: object
+      description: ヘルスデータを返す
       properties:
         status:
           type: string
@@ -129,6 +329,34 @@ components:
       required:
         - token
         - user
+    JWTLoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+      required:
+        - email
+    JWTLoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiJ9..."
+        token_type:
+          type: string
+          example: "Bearer"
+        expires_in:
+          type: integer
+          example: 3600
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - token
+        - token_type
+        - expires_in
+        - user
     User:
       type: object
       properties:
@@ -155,6 +383,9 @@ components:
         code:
           type: string
           example: "UNAUTHORIZED"
+        details:
+          type: string
+          example: "You are not authorized to access this resource"
       required:
         - error
         - code
@@ -168,3 +399,4 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: JWT認証
