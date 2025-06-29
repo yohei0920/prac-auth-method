@@ -2,21 +2,169 @@ openapi: 3.0.0
 info:
   title: Practice API
   version: 1.0.0
-  description: Rails API実践プロジェクト
+  description: Rails API実践プロジェクト - 認証とヘルスチェック機能
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 servers:
   - url: http://localhost:3000
     description: Development server
+  - url: https://api.example.com
+    description: Production server
 paths:
   /api/v1/health:
     get:
+      tags:
+        - Health
       summary: ヘルスチェック
+      description: APIの健全性を確認するエンドポイント
+      operationId: getHealth
       responses:
         "200":
           description: 成功
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: "healthy"
+                timestamp: "2024-01-01T00:00:00Z"
+                version: "1.0.0"
+    post:
+      tags:
+        - Health
+      summary: ヘルスデータ作成
+      description: 新しいヘルスデータを作成
+      operationId: createHealth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HealthRequest"
+      responses:
+        "201":
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: トークン認証ログイン
+      description: メールアドレスを使用してログインし、APIトークンを取得
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "healthy"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00Z"
+        version:
+          type: string
+          example: "1.0.0"
+      required:
+        - status
+    HealthRequest:
+      type: object
+      properties:
+        data:
+          type: string
+          example: "health data"
+        message:
+          type: string
+          example: "Health check message"
+      required:
+        - data
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        password:
+          type: string
+          example: "password123"
+      required:
+        - email
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "api_token_12345"
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - token
+        - user
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        name:
+          type: string
+          example: "John Doe"
+      required:
+        - id
+        - email
+        - name
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Authentication failed"
+        code:
+          type: string
+          example: "UNAUTHORIZED"
+      required:
+        - error
+        - code
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: APIトークン認証
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
