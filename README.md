@@ -57,7 +57,7 @@ docker-compose exec web rails server
 ## APIドキュメント
 
 ### 仕様書
-- [API仕様書](docs/api_specification.md) - 詳細なAPI仕様と使用例
+- [OpenAPI仕様書](https://yhok-bb.github.io/prac-auth-method/) - 詳細なAPI仕様と使用例
 
 ### テスト用コマンド
 - [curlコマンド集](docs/curl_examples.sh) - APIテスト用のcurlコマンド
