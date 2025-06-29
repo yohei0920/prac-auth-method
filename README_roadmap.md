@@ -120,7 +120,7 @@ end
 
 ### 🔄 Phase 3: API設計・開発効率 (現在進行中)
 - [ ] 共通親クラス設計
-- [ ] OpenAPI/Swagger
+- [x] OpenAPI/Swagger
 - [ ] エラーハンドリング
 - [ ] JSON Schema
 - [ ] レート制限 (rack-attack)
