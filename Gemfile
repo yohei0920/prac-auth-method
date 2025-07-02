@@ -38,7 +38,7 @@ gem "redis", "~> 5.0"                     # Redis
 group :development, :test do
   gem "rspec-rails", "~> 6.0"             # RSpec
   gem "factory_bot_rails", "~> 6.4"       # Factory Bot
-  gem "faker", "~> 3.2"                   # テストデータ
+  gem "faker", "~> 3.5"                   # テストデータ
   gem "shoulda-matchers", "~> 5.1"        # テストヘルパー
   gem "database_cleaner-active_record", "~> 2.1"
 end
